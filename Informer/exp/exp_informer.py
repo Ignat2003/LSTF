@@ -160,9 +160,9 @@ class Exp_Informer(Exp_Basic):
                 loss = criterion(pred, true)
                 train_loss.append(loss.item())
                 
-                all_preds.extend(pred.detach().cpu().numpy().tolist())
-                all_trues.extend(true.detach().cpu().numpy().tolist())
-                print('roc-auc', roc_auc_score(all_trues, all_preds),sum(all_trues) )
+                # all_preds.extend(pred.detach().cpu().numpy().tolist())
+                # all_trues.extend(true.detach().cpu().numpy().tolist())
+                print('True', sum(all_trues))
                 if (i+1) % 10==0:
                     print("\titers: {0}, epoch: {1} | loss: {2:.7f}".format(i + 1, epoch + 1, loss.item()))
                     speed = (time.time()-time_now)/iter_count
