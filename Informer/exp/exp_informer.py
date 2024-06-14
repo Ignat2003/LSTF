@@ -91,7 +91,8 @@ class Exp_Informer(Exp_Basic):
             timeenc=timeenc,
             freq=freq,
             cols=args.cols,
-            scale=args.scale
+            scale=args.scale,
+            gap_freq=args.gap_freq
         )
         print(flag, len(data_set))
         data_loader = DataLoader(
@@ -167,11 +168,6 @@ class Exp_Informer(Exp_Basic):
                 
                 all_preds.extend(pred.detach().flatten().cpu().numpy().tolist())
                 all_trues.extend(true.detach().flatten().cpu().numpy().tolist())
-                # if sum(all_trues) > 0:
-                #     print(roc_auc_score(all_trues, all_preds))
-                # all_trues = true.flatten().cpu().numpy().tolist()
-                # if sum(all_trues) > 0:
-                #     print('True', sum(all_trues))
                 
                 if (i+1) % 100==0:
                     print("\titers: {0}, epoch: {1} | loss: {2:.7f}".format(i + 1, epoch + 1, loss.item()))
@@ -179,8 +175,9 @@ class Exp_Informer(Exp_Basic):
                     left_time = speed*((self.args.train_epochs - epoch)*train_steps - i)
                     print('\tspeed: {:.4f}s/iter; left time: {:.4f}s'.format(speed, left_time))
                     
-                    vali_loss, all_trues, all_preds = self.vali(vali_data, vali_loader, criterion)
-                    print(f'Roc-auc valid {roc_auc_score(all_trues, all_preds)} Loss: {vali_loss}')
+                    if (i+1) % 500==0:
+                        vali_loss, all_trues, all_preds = self.vali(vali_data, vali_loader, criterion)
+                        print(f'Roc-auc valid {roc_auc_score(all_trues, all_preds)} Loss: {vali_loss}')
                     iter_count = 0
                     time_now = time.time()
                 
