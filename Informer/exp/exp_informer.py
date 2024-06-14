@@ -11,7 +11,7 @@ import torch
 import torch.nn as nn
 from torch import optim
 from torch.utils.data import DataLoader
-
+from sklearn.metrics import roc_auc_score
 import os
 import time
 
@@ -139,6 +139,9 @@ class Exp_Informer(Exp_Basic):
         model_optim = self._select_optimizer()
         criterion =  self._select_criterion()
 
+        # To store predictions and true labels for ROC AUC calculation
+        all_preds = []
+        all_trues = []
         if self.args.use_amp:
             scaler = torch.cuda.amp.GradScaler()
 
@@ -157,7 +160,10 @@ class Exp_Informer(Exp_Basic):
                 loss = criterion(pred, true)
                 train_loss.append(loss.item())
                 
-                if (i+1) % 100==0:
+                all_preds.extend(pred.detach().cpu().numpy().tolist())
+                all_trues.extend(true.detach().cpu().numpy().tolist())
+                print('roc-auc', roc_auc_score(all_trues, all_preds),sum(all_trues) )
+                if (i+1) % 10==0:
                     print("\titers: {0}, epoch: {1} | loss: {2:.7f}".format(i + 1, epoch + 1, loss.item()))
                     speed = (time.time()-time_now)/iter_count
                     left_time = speed*((self.args.train_epochs - epoch)*train_steps - i)
