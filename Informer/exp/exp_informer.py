@@ -114,14 +114,19 @@ class Exp_Informer(Exp_Basic):
     def vali(self, vali_data, vali_loader, criterion):
         self.model.eval()
         total_loss = []
+        all_preds = []
+        all_trues = []
         for i, (batch_x,batch_y,batch_x_mark,batch_y_mark) in enumerate(vali_loader):
             pred, true = self._process_one_batch(
                 vali_data, batch_x, batch_y, batch_x_mark, batch_y_mark)
             loss = criterion(pred.detach().cpu(), true.detach().cpu())
             total_loss.append(loss)
+            all_preds.extend(pred.detach().flatten().cpu().numpy().tolist())
+            all_trues.extend(true.detach().flatten().cpu().numpy().tolist())
+            
         total_loss = np.average(total_loss)
         self.model.train()
-        return total_loss
+        return total_loss, all_trues, all_preds
 
     def train(self, setting):
         train_data, train_loader = self._get_data(flag = 'train')
@@ -160,15 +165,22 @@ class Exp_Informer(Exp_Basic):
                 loss = criterion(pred, true)
                 train_loss.append(loss.item())
                 
-                # all_preds.extend(pred.detach().cpu().numpy().tolist())
-                # all_trues.extend(true.detach().cpu().numpy().tolist())
-                if sum(true) > 0:
-                    print('True', sum(true))
-                if (i+1) % 10==0:
+                all_preds.extend(pred.detach().flatten().cpu().numpy().tolist())
+                all_trues.extend(true.detach().flatten().cpu().numpy().tolist())
+                # if sum(all_trues) > 0:
+                #     print(roc_auc_score(all_trues, all_preds))
+                # all_trues = true.flatten().cpu().numpy().tolist()
+                # if sum(all_trues) > 0:
+                #     print('True', sum(all_trues))
+                
+                if (i+1) % 100==0:
                     print("\titers: {0}, epoch: {1} | loss: {2:.7f}".format(i + 1, epoch + 1, loss.item()))
                     speed = (time.time()-time_now)/iter_count
                     left_time = speed*((self.args.train_epochs - epoch)*train_steps - i)
                     print('\tspeed: {:.4f}s/iter; left time: {:.4f}s'.format(speed, left_time))
+                    
+                    vali_loss, all_trues, all_preds = self.vali(vali_data, vali_loader, criterion)
+                    print(f'Roc-auc valid {roc_auc_score(all_trues, all_preds)} Loss: {vali_loss}')
                     iter_count = 0
                     time_now = time.time()
                 
