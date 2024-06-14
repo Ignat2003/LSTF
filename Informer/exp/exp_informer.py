@@ -162,7 +162,8 @@ class Exp_Informer(Exp_Basic):
                 
                 # all_preds.extend(pred.detach().cpu().numpy().tolist())
                 # all_trues.extend(true.detach().cpu().numpy().tolist())
-                print('True', sum(all_trues))
+                if sum(true) > 0:
+                    print('True', sum(true))
                 if (i+1) % 10==0:
                     print("\titers: {0}, epoch: {1} | loss: {2:.7f}".format(i + 1, epoch + 1, loss.item()))
                     speed = (time.time()-time_now)/iter_count
