@@ -188,7 +188,7 @@ class Dataset_ETT_minute(Dataset):
 class Dataset_Custom(Dataset):
     def __init__(self, root_path, flag='train', size=None, 
                  features='S', data_path='ETTh1.csv', 
-                 target='OT', scale=True, inverse=False, timeenc=0, freq='h', cols=None):
+                 target='OT', scale=True, inverse=False, timeenc=0, freq='h', cols=None,gap_freq=1):
         # size [seq_len, label_len, pred_len]
         # info
         if size == None:
@@ -213,6 +213,7 @@ class Dataset_Custom(Dataset):
         self.cols=cols
         self.root_path = root_path
         self.data_path = data_path
+        self.gap_freq = gap_freq
         self.__read_data__()
 
     def __read_data__(self):
@@ -256,7 +257,6 @@ class Dataset_Custom(Dataset):
         df_stamp = df_raw[['date']][border1:border2]
         df_stamp['date'] = pd.to_datetime(df_stamp.date)
         data_stamp = time_features(df_stamp, timeenc=self.timeenc, freq=self.freq)
-
         self.data_x = data[border1:border2]
         if self.inverse:
             self.data_y = df_data.values[border1:border2]
@@ -265,6 +265,7 @@ class Dataset_Custom(Dataset):
         self.data_stamp = data_stamp
     
     def __getitem__(self, index):
+        index *= self.gap_freq
         s_begin = index
         s_end = s_begin + self.seq_len
         r_begin = s_end - self.label_len 
@@ -281,7 +282,7 @@ class Dataset_Custom(Dataset):
         return seq_x, seq_y, seq_x_mark, seq_y_mark
     
     def __len__(self):
-        return len(self.data_x) - self.seq_len- self.pred_len + 1
+        return (len(self.data_x) - self.seq_len- self.pred_len + 1) // self.gap_freq
 
     def inverse_transform(self, data):
         return self.scaler.inverse_transform(data)
