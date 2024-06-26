@@ -1,4 +1,5 @@
-from data.data_loader import Dataset_ETT_hour, Dataset_ETT_minute, Dataset_Custom, Dataset_Pred, Dataset_New
+from data.data_loader import Dataset_ETT_hour, Dataset_ETT_minute, Dataset_Custom, Dataset_Pred
+# from data.data_loader import Dataset_New
 from exp.exp_basic import Exp_Basic
 from models.model import Informer, InformerStack
 
