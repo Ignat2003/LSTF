@@ -1,4 +1,4 @@
-from data.data_loader import Dataset_ETT_hour, Dataset_ETT_minute, Dataset_Custom, Dataset_Pred
+from data.data_loader import Dataset_ETT_hour, Dataset_ETT_minute, Dataset_Custom, Dataset_Pred, Dataset_New
 from exp.exp_basic import Exp_Basic
 from models.model import Informer, InformerStack
 
@@ -11,7 +11,7 @@ import torch
 import torch.nn as nn
 from torch import optim
 from torch.utils.data import DataLoader
-from sklearn.metrics import roc_auc_score
+from sklearn.metrics import roc_auc_score, f1_score
 import os
 import time
 
@@ -193,12 +193,15 @@ class Exp_Informer(Exp_Basic):
             train_loss = np.average(train_loss)
             vali_loss, all_trues, all_preds = self.vali(vali_data, vali_loader, criterion)
             roc_auc_val = roc_auc_score(all_trues, all_preds)
+            f1_val = f1_score(all_trues, np.round(all_preds))
             test_loss, all_trues, all_preds = self.vali(test_data, test_loader, criterion)
             roc_auc_test = roc_auc_score(all_trues, all_preds)
+            f1_test = f1_score(all_trues, np.round(all_preds))
 
             print("Epoch: {0}, Steps: {1} | Train Loss: {2:.7f} Vali Loss: {3:.7f} Test Loss: {4:.7f}".format(
                 epoch + 1, train_steps, train_loss, vali_loss, test_loss))
             print('Val Roc auc: {0:.3f} | Test Roc auc: {1:.3f}'.format(roc_auc_val, roc_auc_test))
+            print('Val F1: {0:.3f} | Test F1: {1:.3f}'.format(f1_val, f1_test))
             
             early_stopping(vali_loss, self.model, path)
             if early_stopping.early_stop:
