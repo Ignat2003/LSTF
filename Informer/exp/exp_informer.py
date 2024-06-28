@@ -147,8 +147,7 @@ class Exp_Informer(Exp_Basic):
         criterion =  self._select_criterion()
 
         # To store predictions and true labels for ROC AUC calculation
-        all_preds = []
-        all_trues = []
+        
         if self.args.use_amp:
             scaler = torch.cuda.amp.GradScaler()
 
@@ -158,6 +157,8 @@ class Exp_Informer(Exp_Basic):
             
             self.model.train()
             epoch_time = time.time()
+            all_preds = []
+            all_trues = []
             for i, (batch_x,batch_y,batch_x_mark,batch_y_mark) in enumerate(train_loader):
                 iter_count += 1
                 
