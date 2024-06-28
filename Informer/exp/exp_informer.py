@@ -169,7 +169,6 @@ class Exp_Informer(Exp_Basic):
                 
                 all_preds.extend(pred.detach().flatten().cpu().numpy().tolist())
                 all_trues.extend(true.detach().flatten().cpu().numpy().tolist())
-                
                 if (i+1) % 100==0:
                     print("\titers: {0}, epoch: {1} | loss: {2:.7f}".format(i + 1, epoch + 1, loss.item()))
                     speed = (time.time()-time_now)/iter_count
@@ -193,9 +192,11 @@ class Exp_Informer(Exp_Basic):
             print("Epoch: {} cost time: {}".format(epoch+1, time.time()-epoch_time))
             train_loss = np.average(train_loss)
             vali_loss, all_trues, all_preds = self.vali(vali_data, vali_loader, criterion)
+            all_preds = np.minimum(np.maximum(all_preds, 0), 1)
             roc_auc_val = roc_auc_score(all_trues, all_preds)
             f1_val = f1_score(all_trues, np.round(all_preds))
             test_loss, all_trues, all_preds = self.vali(test_data, test_loader, criterion)
+            all_preds = np.minimum(np.maximum(all_preds, 0), 1)
             roc_auc_test = roc_auc_score(all_trues, all_preds)
             f1_test = f1_score(all_trues, np.round(all_preds))
 
