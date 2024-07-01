@@ -201,7 +201,7 @@ class Exp_Informer(Exp_Basic):
             all_preds = np.minimum(np.maximum(all_preds, 0), 1)
             # roc_auc_test = roc_auc_score(all_trues, all_preds)
             # f1_test = f1_score(all_trues, np.round(all_preds))
-            roc_auc_test, f1_test = 0
+            roc_auc_test, f1_test = 0,0
             print("Epoch: {0}, Steps: {1} | Train Loss: {2:.7f} Vali Loss: {3:.7f} Test Loss: {4:.7f}".format(
                 epoch + 1, train_steps, train_loss, vali_loss, test_loss))
             print('Val Roc auc: {0:.3f} | Test Roc auc: {1:.3f}'.format(roc_auc_val, roc_auc_test))
