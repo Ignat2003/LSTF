@@ -111,7 +111,7 @@ class Exp_Informer(Exp_Basic):
         return model_optim
     
     def _select_criterion(self):
-        criterion =  nn.MSELoss()
+        criterion =  nn.L1Loss()
         return criterion
 
     def vali(self, vali_data, vali_loader, criterion):
