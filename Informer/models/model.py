@@ -73,7 +73,8 @@ class Informer(nn.Module):
         dec_out = self.dec_embedding(x_dec, x_mark_dec)
         dec_out = self.decoder(dec_out, enc_out, x_mask=dec_self_mask, cross_mask=dec_enc_mask)
         dec_out = self.projection(dec_out)
-        dec_out = self.sigmoid(dec_out[:,-self.pred_len:,:])
+        dec_out = dec_out[:,-self.pred_len:,:]
+        # dec_out = self.sigmoid(dec_out[:,-self.pred_len:,:])
         
         # dec_out = self.end_conv1(dec_out)
         # dec_out = self.end_conv2(dec_out.transpose(2,1)).transpose(1,2)
