@@ -111,10 +111,11 @@ class Exp_Informer(Exp_Basic):
         return model_optim
     
     def _select_criterion(self):
-        if self.args.pos_weight:
-            criterion =  nn.BCEWithLogitsLoss(pos_weight=self.args.pos_weight)
-        else:
-            criterion =  nn.BCEWithLogitsLoss()
+        # if self.args.pos_weight:
+        #     criterion =  nn.BCEWithLogitsLoss(pos_weight=self.args.pos_weight)
+        # else:
+        #     criterion =  nn.BCEWithLogitsLoss()
+        criterion = nn.MSELoss()
         return criterion
 
     def vali(self, vali_data, vali_loader, criterion):
